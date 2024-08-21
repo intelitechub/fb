@@ -53,6 +53,7 @@ if RUBY_PLATFORM =~ WINDOWS_PLATFORMS and ARGV.grep(/^--with-opt-dir=/).empty?
     ARGV << "--with-opt-dir=#{opt}"
   else
     puts "No any Firebird instances found in system."
+    puts "RUBY_PLATFORM: #{RUBY_PLATFORM}"
     exit
   end
 end
