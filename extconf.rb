@@ -69,22 +69,12 @@ if ARGV.grep(/^--with-opt-dir=/).empty?
 else
   require 'mkmf'
 
-  libs = %w/ fbclient gds /
+  libs = %w/ fbclient /
 
   case RUBY_PLATFORM
-    when /bccwin32/
-      libs.push "fbclient_bor"
     when WINDOWS_PLATFORMS
       $CFLAGS  = $CFLAGS + " -DOS_WIN32"
       libs.push "fbclient_ms"
-    when /darwin/
-  #    hosttype = `uname -m`.chomp
-      $CFLAGS += " -DOS_UNIX"
-  #    $CFLAGS.gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
-  #    $LDFLAGS.gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
-  #    CONFIG['LDSHARED'].gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
-      $CPPFLAGS += " -I/Library/Frameworks/Firebird.framework/Headers"
-      $LDFLAGS += " -framework Firebird"
     when /linux/
       $CFLAGS  = $CFLAGS + " -DOS_UNIX"
   end
