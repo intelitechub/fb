@@ -13,6 +13,11 @@
 # * Unit tests take about 10 times as long to complete using Firebird Classic.  Default xinetd.conf settings may not allow the tests to complete due to the frequency with which new attachments are made.
 # = Mac OS X (Intel)
 # * Works
+
+require 'logger'
+
+logger = Logger.new($stdout)
+
 WINDOWS_PLATFORMS = /(mingw32|mswin32|x64-mingw-ucrt)/
 
 def unquote(string)
@@ -54,18 +59,18 @@ elsif RUBY_PLATFORM =~ WINDOWS_PLATFORMS and ARGV.grep(/^--with-opt-dir=/).empty
   if opt
     ARGV << "--with-opt-dir=#{opt}"
   else
-    puts "No any Firebird instances found in system (Plataform: #{RUBY_PLATFORM.to_s})."
+    logger.error "No any Firebird instances found in system (Plataform: #{RUBY_PLATFORM.to_s})."
     exit
   end
 end
 
 if ARGV.grep(/^--with-opt-dir=/).empty?
-  STDERR.puts "Firebird path not defined (Plataform: #{RUBY_PLATFORM.to_s})"
+  logger.error "Firebird path not defined (Plataform: #{RUBY_PLATFORM.to_s})"
   exit
 else
-  STDERR.puts "Installing FB Connector..."
-  STDERR.puts "  Plataform: #{RUBY_PLATFORM.to_s}"
-  STDERR.puts "  ARGV: #{ARGV.to_s}"
+  logger.info "Installing FB Connector..."
+  logger.info "  Plataform: #{RUBY_PLATFORM.to_s}"
+  logger.info "  ARGV: #{ARGV.to_s}"
 end
 
 require 'mkmf'
