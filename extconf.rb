@@ -14,11 +14,6 @@
 # = Mac OS X (Intel)
 # * Works
 
-require 'logger'
-
-logger = Logger.new(STDOUT)
-logger.level = Logger::WARN
-
 WINDOWS_PLATFORMS = /(mingw32|mswin32|x64-mingw-ucrt)/
 
 def unquote(string)
@@ -60,52 +55,51 @@ elsif RUBY_PLATFORM =~ WINDOWS_PLATFORMS and ARGV.grep(/^--with-opt-dir=/).empty
   if opt
     ARGV << "--with-opt-dir=#{opt}"
   else
-    logger.error "No any Firebird instances found in system (Plataform: #{RUBY_PLATFORM.to_s})."
+    puts "No any Firebird instances found in system (Plataform: #{RUBY_PLATFORM.to_s})."
     exit
   end
 end
 
+puts "Installing FB Connector..."
+puts "  Plataform: #{RUBY_PLATFORM.to_s}"
+puts "  ARGV: #{ARGV.to_s}"
+
 if ARGV.grep(/^--with-opt-dir=/).empty?
-  logger.error "Firebird path not defined (Plataform: #{RUBY_PLATFORM.to_s})"
-  exit
+  puts "Firebird path not defined."
 else
-  logger.info "Installing FB Connector..."
-  logger.info "  Plataform: #{RUBY_PLATFORM.to_s}"
-  logger.info "  ARGV: #{ARGV.to_s}"
-end
+  require 'mkmf'
 
-require 'mkmf'
+  libs = %w/ fbclient gds /
 
-libs = %w/ fbclient gds /
+  case RUBY_PLATFORM
+    when /bccwin32/
+      libs.push "fbclient_bor"
+    when WINDOWS_PLATFORMS
+      $CFLAGS  = $CFLAGS + " -DOS_WIN32"
+      libs.push "fbclient_ms"
+    when /darwin/
+  #    hosttype = `uname -m`.chomp
+      $CFLAGS += " -DOS_UNIX"
+  #    $CFLAGS.gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
+  #    $LDFLAGS.gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
+  #    CONFIG['LDSHARED'].gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
+      $CPPFLAGS += " -I/Library/Frameworks/Firebird.framework/Headers"
+      $LDFLAGS += " -framework Firebird"
+    when /linux/
+      $CFLAGS  = $CFLAGS + " -DOS_UNIX"
+  end
 
-case RUBY_PLATFORM
-  when /bccwin32/
-    libs.push "fbclient_bor"
+  dir_config("firebird")
+
+  test_func = "isc_attach_database"
+
+  case RUBY_PLATFORM
   when WINDOWS_PLATFORMS
-    $CFLAGS  = $CFLAGS + " -DOS_WIN32"
-    libs.push "fbclient_ms"
-  when /darwin/
-#    hosttype = `uname -m`.chomp
-    $CFLAGS += " -DOS_UNIX"
-#    $CFLAGS.gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
-#    $LDFLAGS.gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
-#    CONFIG['LDSHARED'].gsub!(/-arch (\w+)/) { |m| $1 == hosttype ? m : '' }
-    $CPPFLAGS += " -I/Library/Frameworks/Firebird.framework/Headers"
-    $LDFLAGS += " -framework Firebird"
-  when /linux/
-    $CFLAGS  = $CFLAGS + " -DOS_UNIX"
+    libs.find {|lib| have_library(lib) } and
+      have_func(test_func, ["ibase.h"])
+  else
+    libs.find {|lib| have_library(lib, test_func) }
+  end
+
+  create_makefile("fb")
 end
-
-dir_config("firebird")
-
-test_func = "isc_attach_database"
-
-case RUBY_PLATFORM
-when WINDOWS_PLATFORMS
-  libs.find {|lib| have_library(lib) } and
-    have_func(test_func, ["ibase.h"])
-else
-  libs.find {|lib| have_library(lib, test_func) }
-end
-
-create_makefile("fb")
