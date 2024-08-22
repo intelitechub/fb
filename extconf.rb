@@ -62,6 +62,10 @@ end
 if ARGV.grep(/^--with-opt-dir=/).empty?
   puts "Firebird path not defined (Plataform: #{RUBY_PLATFORM.to_s})"
   exit
+else
+  pust "Installing FB Connector..."
+  puts "  Plataform: #{RUBY_PLATFORM.to_s}"
+  puts "  ARGV: #{ARGV.to_s}"
 end
 
 require 'mkmf'
