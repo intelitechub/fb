@@ -54,10 +54,14 @@ elsif RUBY_PLATFORM =~ WINDOWS_PLATFORMS and ARGV.grep(/^--with-opt-dir=/).empty
   if opt
     ARGV << "--with-opt-dir=#{opt}"
   else
-    puts "No any Firebird instances found in system."
-    puts "RUBY_PLATFORM"
+    puts "No any Firebird instances found in system (Plataform: #{RUBY_PLATFORM.to_s})."
     exit
   end
+end
+
+if ARGV.grep(/^--with-opt-dir=/).empty?
+  puts "Firebird path not defined (Plataform: #{RUBY_PLATFORM.to_s})"
+  exit
 end
 
 require 'mkmf'
