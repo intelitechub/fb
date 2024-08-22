@@ -16,7 +16,8 @@
 
 require 'logger'
 
-logger = Logger.new($stdout)
+logger = Logger.new(STDOUT)
+logger.level = Logger::WARN
 
 WINDOWS_PLATFORMS = /(mingw32|mswin32|x64-mingw-ucrt)/
 
