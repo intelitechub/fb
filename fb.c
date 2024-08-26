@@ -425,7 +425,8 @@ static VALUE fb_sql_type_from_code(int code, int subtype)
 		case SQL_INT64:
 		case blr_int64:
 			switch (subtype) {
-				case 0:		sql_type = "BIGINT";	break;
+				//case 0:		sql_type = "BIGINT";	break; // Dialect 3
+				case 0:		sql_type = "INTEGER";	break; // Dialect 1
 				case 1:		sql_type = "NUMERIC";	break;
 				case 2:		sql_type = "DECIMAL";	break;
 			}
