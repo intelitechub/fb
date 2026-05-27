@@ -498,8 +498,8 @@ static VALUE cursor_drop _((VALUE));
 static VALUE cursor_execute _((int, VALUE*, VALUE));
 static VALUE cursor_fetchall _((int, VALUE*, VALUE));
 
-static void fb_cursor_mark();
-static void fb_cursor_free();
+static void fb_cursor_mark(struct FbCursor *fb_cursor);
+static void fb_cursor_free(struct FbCursor *fb_cursor);
 
 /* connection utilities */
 static void fb_connection_check(struct FbConnection *fb_connection)
